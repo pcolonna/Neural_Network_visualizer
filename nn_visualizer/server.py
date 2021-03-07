@@ -1,12 +1,16 @@
+import json
+import tensorflow as tf
+from tensorflow.keras.models import load_model
+import numpy as np
 import os
 import random
-import string
+import config
 
 from flask import Flask, request
 
 app = Flask(__name__)
 
-model = tf.keras.models.load_model('model.h5')
+model = load_model(config.model_path)
 feature_model = tf.keras.models.Model(model.inputs, [layer.output for layer in model.layers])
 
 _, (x_test, _) = tf.keras.datasets.mnist.load_data()
