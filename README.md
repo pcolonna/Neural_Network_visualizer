@@ -1,2 +1,2 @@
-# Neural_Network_visualizer
+# Neural Network Visualizer
 Visualized the hidden node of a neural network
