@@ -1,12 +1,12 @@
 import json
-import tensorflow as tf
-from tensorflow.keras.models import load_model
-import numpy as np
 import os
 import random
-import config
 
+import config
+import numpy as np
+import tensorflow as tf
 from flask import Flask, request
+from tensorflow.keras.models import load_model
 
 app = Flask(__name__)
 
@@ -14,21 +14,24 @@ model = load_model(config.model_path)
 feature_model = tf.keras.models.Model(model.inputs, [layer.output for layer in model.layers])
 
 _, (x_test, _) = tf.keras.datasets.mnist.load_data()
-x_test = x_test / 255.
+x_test = x_test / 255.0
+
 
 def get_prediction():
     index = np.random.choice(x_test.shape[0])
-    image = x_test[index,:,:]
+    image = x_test[index, :, :]
     image_arr = np.reshape(image, (1, 784))
     return feature_model.predict(image_arr), image
 
-@app.route('/', methods=['GET', 'POST'])
+
+@app.route("/", methods=["GET", "POST"])
 def index():
-    if request.method == 'POST':
+    if request.method == "POST":
         preds, image = get_prediction()
         final_preds = [p.tolist() for p in preds]
-        return json.dumps({'prediction': final_preds, 'image': image.tolist()})
-    return 'Welcome to the ml server'
+        return json.dumps({"prediction": final_preds, "image": image.tolist()})
+    return "Welcome to the ml server"
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     app.run()
