@@ -11,14 +11,18 @@ import model
 
 app = Flask(__name__)
 
-saved_model = load_model(config.model_path)
-feature_model = tf.keras.models.Model(saved_model.inputs, [layer.output for layer in saved_model.layers])
+feature_model = None
 
-_, (x_test, _) = tf.keras.datasets.mnist.load_data()
-x_test = x_test / 255.0
-
+def load_saved_model():
+    global  feature_model
+    loaded_model = load_model(config.model_path)
+    feature_model = tf.keras.models.Model(loaded_model.inputs, [layer.output for layer in loaded_model.layers])
 
 def get_prediction():
+
+    _, (x_test, _) = tf.keras.datasets.mnist.load_data()
+    x_test = x_test / 255.0
+
     index = np.random.choice(x_test.shape[0])
     image = x_test[index, :, :]
     image_arr = np.reshape(image, (1, 784))
@@ -43,8 +47,13 @@ def train():
     batch_size=data.get('num_layers', 2)
     epochs= data.get('epochs', 2)
 
-    model.train(num_layers=num_layers, hidden_units_per_layers=hidden_units_per_layers, epochs=epochs, batch_size=batch_size)
-
+    _ = model.train(num_layers=num_layers, hidden_units_per_layers=hidden_units_per_layers, epochs=epochs, batch_size=batch_size)
+    
+    load_saved_model()
+    
     return json.dumps({'status': 'done'})
+
+
 if __name__ == "__main__":
+    load_saved_model()
     app.run()
