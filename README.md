@@ -1,5 +1,5 @@
 # Neural Network Visualizer
-Visualized the hidden node of a neural network
+Visualize the hidden nodes activations in a neural network.
 
 # How to use
 
