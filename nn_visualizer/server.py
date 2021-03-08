@@ -11,6 +11,7 @@ from tensorflow.keras.models import load_model
 app = Flask(__name__)
 
 model = load_model(config.model_path)
+print(model.summary())
 feature_model = tf.keras.models.Model(model.inputs, [layer.output for layer in model.layers])
 
 _, (x_test, _) = tf.keras.datasets.mnist.load_data()

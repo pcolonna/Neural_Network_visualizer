@@ -22,7 +22,6 @@ if st.sidebar.button("Train the new model"):
 
 if st.sidebar.button("Get random predictions"):
     response = requests.post(URI, data={})
-    # print(response.text)
     response = json.loads(response.text)
     preds = response.get("prediction")
     image = response.get("image")
@@ -33,14 +32,13 @@ if st.sidebar.button("Get random predictions"):
     for layer, p in enumerate(preds):
         numbers = np.squeeze(np.array(p))
 
+        print(len(numbers))
         fig = plt.figure(figsize=(32, 4))
 
-        if layer == 2:
-            row = 1
-            col = 10
-        else:
-            row = 2
-            col = 16
+        # print(len(numbers) / 16)
+
+        row = round(len(numbers) / 16)
+        col = 16
 
         for i, number in enumerate(numbers):
             plt.subplot(row, col, i + 1)
