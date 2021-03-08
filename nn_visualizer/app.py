@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import requests
 import streamlit as st
+import math
 
 URI = "http://127.0.0.1:5000"
 
@@ -12,12 +13,13 @@ st.title("Neural Network Visualizer")
 st.sidebar.title("Parameters")
 
 num_layers = st.sidebar.slider("Number of Layers", min_value=2, max_value=10, step=1)
-hidden_units_per_layers = st.sidebar.slider("Number of hidden units per layers", min_value=2, max_value=16, step=1)
+hidden_units_per_layers = st.sidebar.slider("Number of hidden units per layers", min_value=2, max_value=64, step=1)
 
 batch_size = st.sidebar.slider("Batch Size", min_value=16, max_value=256, step=16)
+epochs = st.sidebar.slider("Epochs", min_value=2, max_value=30, step=1)
 
 if st.sidebar.button("Train the new model"):
-    pass
+    response = requests.post(URI + '/train', json={'num_layers':num_layers, 'hidden_units_per_layers':hidden_units_per_layers, 'batch_size':batch_size, 'epochs':epochs})
 
 
 if st.sidebar.button("Get random predictions"):
@@ -32,12 +34,11 @@ if st.sidebar.button("Get random predictions"):
     for layer, p in enumerate(preds):
         numbers = np.squeeze(np.array(p))
 
-        print(len(numbers))
         fig = plt.figure(figsize=(32, 4))
 
-        # print(len(numbers) / 16)
 
-        row = round(len(numbers) / 16)
+        row = math.ceil(len(numbers) / 16)
+        print(len(numbers) / 16)
         col = 16
 
         for i, number in enumerate(numbers):
