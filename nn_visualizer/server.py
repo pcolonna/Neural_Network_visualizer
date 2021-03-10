@@ -3,20 +3,23 @@ import os
 import random
 
 import config
+import model
 import numpy as np
 import tensorflow as tf
+import utils
 from flask import Flask, request
 from tensorflow.keras.models import load_model
-import model
 
 app = Flask(__name__)
 
 feature_model = None
 
+
 def load_saved_model():
-    global  feature_model
+    global feature_model
     loaded_model = load_model(config.model_path)
     feature_model = tf.keras.models.Model(loaded_model.inputs, [layer.output for layer in loaded_model.layers])
+
 
 def get_prediction():
 
@@ -37,21 +40,30 @@ def index():
         return json.dumps({"prediction": final_preds, "image": image.tolist()})
     return "Welcome to the ml server"
 
+
 @app.route("/train", methods=["POST"])
 def train():
-    
-    data = request.get_json()
-    
-    num_layers=data.get('num_layers', 2)
-    hidden_units_per_layers=data.get('hidden_units_per_layers', 2)
-    batch_size=data.get('num_layers', 2)
-    epochs= data.get('epochs', 2)
 
-    _ = model.train(num_layers=num_layers, hidden_units_per_layers=hidden_units_per_layers, epochs=epochs, batch_size=batch_size)
-    
+    data = request.get_json()
+
+    num_layers = data.get("num_layers", 2)
+    hidden_units_per_layers = data.get("hidden_units_per_layers", 2)
+    batch_size = data.get("num_layers", 2)
+    epochs = data.get("epochs", 2)
+
+    _ = model.train(
+        num_layers=num_layers, hidden_units_per_layers=hidden_units_per_layers, epochs=epochs, batch_size=batch_size
+    )
+
     load_saved_model()
-    
-    return json.dumps({'status': 'done'})
+
+    return json.dumps({"status": "done"})
+
+
+@app.route("/summary", methods=["POST"])
+def summary():
+    loaded_model = load_model(config.model_path)
+    return utils.summarize(loaded_model)
 
 
 if __name__ == "__main__":
